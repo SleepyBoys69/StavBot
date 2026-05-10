@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-base:    #0e0e10;
+    --bg-surface: #16161a;
+    --bg-panel:   #1c1c22;
+    --bg-border:  #2a2a35;
+    --accent:     #f5a623;
+    --accent-dim: #e8902a;
+    --text-prim:  #f0f0f4;
+    --text-sec:   #9090a8;
+    --text-muted: #55556a;
+
+    /* ── iPhone safe-area helpers ──────────────────────────────────────── */
+    --sat: env(safe-area-inset-top,    0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left,   0px);
+    --sar: env(safe-area-inset-right,  0px);
+  }
+
+  html {
+    background-color: var(--bg-base);
+    color: var(--text-prim);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    min-height: 100vh;
+    min-height: 100dvh; /* fill viewport on iOS standalone */
+  }
+
+  /* ─── Grain overlay on <html> ─── */
+  html::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+    opacity: 0.025;
+  }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar       { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--bg-border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a50; }
+}
+
+@layer components {
+  /* ─── Glass panel ─── */
+  .glass {
+    background: rgba(28, 28, 34, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ─── Sound card active glow ─── */
+  .card-active {
+    box-shadow: 0 0 0 2px #f5a623, 0 0 28px rgba(245,166,35,0.3);
+  }
+
+  /* ─── Playing bar waveform dots ─── */
+  .wave-dot {
+    display: inline-block;
+    width: 3px;
+    border-radius: 2px;
+    background: #f5a623;
+    animation: waveBounce 1s ease-in-out infinite;
+  }
+  .wave-dot:nth-child(1) { animation-delay: 0.0s; }
+  .wave-dot:nth-child(2) { animation-delay: 0.1s; }
+  .wave-dot:nth-child(3) { animation-delay: 0.2s; }
+  .wave-dot:nth-child(4) { animation-delay: 0.3s; }
+  .wave-dot:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes waveBounce {
+    0%, 100% { height: 4px;  }
+    50%       { height: 18px; }
+  }
+
+  /* ─── Pulse ring on active card ─── */
+  @keyframes pulseRing {
+    0%   { box-shadow: 0 0 0 0 rgba(245,166,35,0.5); }
+    70%  { box-shadow: 0 0 0 8px rgba(245,166,35,0); }
+    100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); }
+  }
+
+  .pulse-ring {
+    animation: pulseRing 1.8s ease-out infinite;
+  }
+}
+
+/* ── iPhone safe-area utilities ──────────────────────────────────────────
+   Applied via inline style or className on Header and PlayerBar.
+   Using @layer utilities so Tailwind doesn't purge them.
+─────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Header: push down by the status-bar height (notch / Dynamic Island) */
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* PlayerBar: add extra bottom padding so content clears home indicator */
+  .safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  /* Side gutters (landscape notch) */
+  .safe-left  { padding-left:  env(safe-area-inset-left,  0px); }
+  .safe-right { padding-right: env(safe-area-inset-right, 0px); }
+}
